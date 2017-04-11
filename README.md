@@ -11,7 +11,7 @@ import           Network.HTTP.Client     (newManager)
 import           Network.HTTP.Client.TLS (tlsManagerSettings)
 
 import           Servant.Client
-import           Web.Mastodon.API        as API
+import           Web.Mastodon.API
 import           Web.Mastodon.Auth
 import           Web.Mastodon.Monad
 
