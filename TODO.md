@@ -1,0 +1,27 @@
+- [ ] Cover whole API
+  - First priority: `Apps.hs` (OAuth stuff and bearer token) - rename?
+    - Will include methods for getting the OAuth credentials & bearer token (see [here](https://github.com/tootsuite/mastodon/blob/master/docs/Using-the-API/API.md#apps) and [here](https://github.com/tootsuite/mastodon/blob/master/docs/Using-the-API/Testing-with-cURL.md)).
+  - BaseUrl shouldn't include /api/v1, that should be a part of the API type
+  - Actually cover all types
+- [ ] Documentation for everything
+- [ ] Testing
+  - [ ] Once Apps.hs is implemented, no need to pass in a token.
+- [ ] Version bound dependencies
+- [ ] Update cabal file completely and correctly
+- [ ] Correct JSON deserialization (parse urls and times!)
+- [ ] Add methods which use Mastodon monad
+- [x] Should `AuthClientData (AuthProtect MastodonAuth) = MastodonConfig`? _Answer: **No, for now**_
+  - This would mean that we put in the token from the config in mastodonAuth
+  - By changing this we change what we need to pass to every method (from token and function to config and function)
+  - This would be more flexible in the future if we need to have anything else additional in the config
+  - Downsides: could be annoying (having to pass around a dict)?
+- [ ] Re-exports and the module hierarchy
+  - [ ] Re-export `Auth` from `API`?
+  - [x] ~What to do with `Web.Mastodon`?~ _Answer: **Re-export everything from here**_
+  - [ ] Naming of functions
+    - Conflicts with types record fields
+    - General Plan:
+      - `-ForId` suffix for anything which doesn't apply to the current user and takes an id
+        - (maybe?) For functions like `follow` and `block`, we could append `-Id`
+        - Accounts -> ForId, Apps -> Reg, new Actions; move follow/block/etc to Actions
+      - (maybe?) `-M` suffix for anything which returns `Mastodon a`

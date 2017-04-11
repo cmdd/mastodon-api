@@ -1,0 +1,59 @@
+name:                mastodon-api
+version:             0.1.0.0
+synopsis:            Haskell interface to the Mastodon API
+homepage:            https://github.com/cmdd/mastodon-api
+license:             BSD3
+license-file:        LICENSE
+author:              David Cao
+maintainer:          David Cao <dcao@protonmail.com>
+copyright:           2017 David Cao
+category:            Web
+build-type:          Simple
+extra-source-files:  .gitignore
+                   , README.md
+cabal-version:       >=1.10
+tested-with:         GHC == 8.0.2
+description:
+  See README.md
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Web.Mastodon
+                     , Web.Mastodon.API
+                     , Web.Mastodon.API.Accounts
+                     , Web.Mastodon.API.Actions
+                     , Web.Mastodon.API.Apps
+                     , Web.Mastodon.API.Statuses
+                     , Web.Mastodon.Auth
+                     , Web.Mastodon.Misc
+                     , Web.Mastodon.Monad
+                     , Web.Mastodon.Types
+  build-depends:       base >= 4.7 && < 5
+  default-language:    Haskell2010
+  build-depends:       aeson
+                     , http-api-data
+                     , microlens-th
+                     , servant
+                     , servant-client
+                     , text
+                     , transformers
+
+test-suite mastodon-api-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:       base
+                     , hspec
+                     , http-client
+                     , http-client-tls
+                     , mastodon-api
+                     , optparse-applicative
+                     , servant
+                     , servant-client
+                     , text
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/cmdd/mastodon-api
