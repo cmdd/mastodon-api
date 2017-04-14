@@ -7,7 +7,8 @@ module Web.Mastodon.API
   ,
   ) where
 
-import           Web.Mastodon.API.Accounts as API
-import           Web.Mastodon.API.Actions  as API
-import           Web.Mastodon.API.Apps     as API
-import           Web.Mastodon.API.Statuses as API
+import           Web.Mastodon.API.Accounts  as API
+import           Web.Mastodon.API.Actions   as API
+import           Web.Mastodon.API.Apps      as API
+import           Web.Mastodon.API.Statuses  as API
+import           Web.Mastodon.API.Timelines as API

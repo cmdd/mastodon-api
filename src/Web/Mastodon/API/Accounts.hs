@@ -114,7 +114,7 @@ muteM aid = ReaderT $ \t ->
 
 unmuteM :: Uid Account -> Mastodon Account
 unmuteM aid = ReaderT $ \t ->
-  mute_ (tokenToAuth t) aid
+  unmute_ (tokenToAuth t) aid
 
 relationshipsM :: [Uid Account] -> Mastodon [Relationship]
 relationshipsM ids = ReaderT $ \t ->

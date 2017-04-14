@@ -24,6 +24,7 @@ library
                      , Web.Mastodon.API.Actions
                      , Web.Mastodon.API.Apps
                      , Web.Mastodon.API.Statuses
+                     , Web.Mastodon.API.Timelines
                      , Web.Mastodon.Auth
                      , Web.Mastodon.Misc
                      , Web.Mastodon.Monad
@@ -37,6 +38,7 @@ library
                      , servant-client
                      , text
                      , transformers
+                     , unordered-containers
 
 test-suite mastodon-api-test
   type:                exitcode-stdio-1.0

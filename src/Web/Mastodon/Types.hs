@@ -1,35 +1,22 @@
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE FunctionalDependencies     #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedLists            #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE FlexibleInstances          #-}
 
-module Web.Mastodon.Types
-    ( Account(..)
-    , Application(..)
-    , Attachment(..), AttachmentType(..)
-    , Mention(..)
-    , Notification(..), NotificationType(..)
-    , Relationship(..)
-    , Report(..)
-    , SearchQuery(..), SearchResults(..)
-    , Status(..), Visibility(..)
-    , Tag(..)
-    , Uid(..), UidObj(..)
-    , UriObj(..)
-    , Url(..)
-    ) where
+module Web.Mastodon.Types where
 
 import           Control.Applicative
-import           Lens.Micro.TH
 import           Data.Aeson
+import           Data.HashMap.Lazy   (fromList)
+import           Data.Monoid         ((<>))
 import qualified Data.Text           as T
+import           Lens.Micro.TH
 import           Web.FormUrlEncoded
 import           Web.HttpApiData     (ToHttpApiData, toQueryParam)
 
--- TODO: Lens?
 -- TODO: Int instead of Integer? (using Integer can cause overflow)
 -- TODO: Proper time & url parsing
 
@@ -88,6 +75,12 @@ instance FromJSON Visibility where
       "private"  -> pure Private
       "direct"   -> pure Direct
       _          -> empty
+
+instance ToHttpApiData Visibility where
+  toQueryParam Public   = toQueryParam ("public"   :: T.Text)
+  toQueryParam Unlisted = toQueryParam ("unlisted" :: T.Text)
+  toQueryParam Private  = toQueryParam ("private"  :: T.Text)
+  toQueryParam Direct   = toQueryParam ("direct"   :: T.Text)
 
 data Account = Account
   { _accountId             :: Uid Account
@@ -149,6 +142,29 @@ instance FromJSON Attachment where
                <*> o .:  "preview_url"
                <*> o .:? "text_url"
 
+data Card = Card
+  { _cardUrl         :: Url
+  , _cardTitle       :: T.Text
+  , _cardDescription :: T.Text
+  , _cardImage       :: Maybe Url
+  } deriving (Show)
+
+instance FromJSON Card where
+  parseJSON = withObject "card" $ \o ->
+    Card <$> o .:  "url"
+         <*> o .:  "title"
+         <*> o .:  "description"
+         <*> o .:? "image"
+
+data Context = Context
+  { _contextAncestors   :: [Status]
+  , _contextDescendants :: [Status]
+  } deriving (Show)
+
+instance FromJSON Context where
+  parseJSON = withObject "context" $ \o ->
+    Context <$> o .: "ancestors"
+            <*> o .: "descendants"
 
 data Notification = Notification
   { _notificationId        :: Uid Notification
@@ -275,6 +291,27 @@ instance FromJSON Status where
            <*> o .:  "tags"
            <*> o .:  "application"
 
+data StatusPayload = StatusPayload
+  { _statusPayloadStatus :: T.Text
+  , _statusPayloadInReplyToId :: Maybe (Uid Status)
+  , _statusPayloadMediaIds :: Maybe [Uid Attachment]
+  , _statusPayloadSensitive :: Maybe Bool
+  , _statusPayloadSpoilerText :: Maybe T.Text
+  , _statusPayloadVisibility :: Maybe Visibility
+  } deriving (Show)
+
+instance ToForm StatusPayload where
+  toForm (StatusPayload status rid mids sens st vis) =
+    [ ("status",         toQueryParam status)
+    , ("in_reply_to_id", toQueryParam rid)
+    , ("sensitive",      toQueryParam sens)
+    , ("spoiler_text",   toQueryParam st)
+    , ("visibility",     toQueryParam vis) ] <> hmap
+    where
+      keys = map (\y -> "media_ids" <> "[" <> y <> "]") (fmap (T.pack . show) [0..])
+      hash = zip keys $ toQueryParam <$> sequenceA mids
+      hmap = Form . fromList . fmap (\(k, v) -> (k, [v])) $ hash
+
 data Tag = Tag
   { _tagName :: T.Text
   , _tagUrl  :: Url
@@ -313,11 +350,14 @@ instance FromJSON Url where
 makeFields ''Account
 makeFields ''Application
 makeFields ''Attachment
+makeFields ''Card
+makeFields ''Context
 makeFields ''Notification
 makeFields ''Mention
 makeFields ''Relationship
 makeFields ''Report
-makeFields ''SearchQuery
+-- makeFields ''SearchQuery
 makeFields ''SearchResults
 makeFields ''Status
+-- makeFields ''StatusPayload
 makeFields ''Tag
