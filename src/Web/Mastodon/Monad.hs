@@ -6,7 +6,6 @@ module Web.Mastodon.Monad
   , runMastodon
   ) where
 
-import           Control.Monad.Trans.Class
 import           Control.Monad.Trans.Reader
 import           Servant.Client             (ClientEnv, ClientM, ServantError,
                                              runClientM)

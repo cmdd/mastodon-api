@@ -330,15 +330,15 @@ instance FromJSON Time where
 
 -- | Type which represents a form payload of some Uid.
 --   Essentially, an object with just an id field.
-newtype UidObj a = UidObj (Uid a) deriving (Show)
+newtype UidPayload a = UidPayload (Uid a) deriving (Show)
 
-instance ToForm (UidObj a) where
-  toForm (UidObj a) = [("id", toQueryParam a)]
+instance ToForm (UidPayload a) where
+  toForm (UidPayload a) = [("id", toQueryParam a)]
 
-newtype UriObj = Uri T.Text deriving (Show)
+newtype UriPayload = UriPayload T.Text deriving (Show)
 
-instance ToForm UriObj where
-  toForm (Uri a) = [("uri", toQueryParam a)]
+instance ToForm UriPayload where
+  toForm (UriPayload a) = [("uri", toQueryParam a)]
 
 -- TODO: An actual Url type, not just a string
 newtype Url = Url { getUrl :: T.Text } deriving (Show)

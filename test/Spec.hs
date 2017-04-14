@@ -72,6 +72,6 @@ getId :: MastodonToken -> String -> IO Bool
 getId token base = do
   manager <- newManager tlsManagerSettings
   let clientEnv = ClientEnv manager (BaseUrl Https base 443 "/api/v1")
-  res <- runMastodon verifyCredentialsM token clientEnv
+  res <- runMastodon verifyCredentials token clientEnv
   print res
   return $ isRight res
