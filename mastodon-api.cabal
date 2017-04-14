@@ -1,5 +1,5 @@
 name:                mastodon-api
-version:             0.1.0.0
+version:             0.0.1.0
 synopsis:            Haskell interface to the Mastodon API
 homepage:            https://github.com/cmdd/mastodon-api
 license:             BSD3
