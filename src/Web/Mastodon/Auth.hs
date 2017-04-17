@@ -1,8 +1,7 @@
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE TypeFamilies               #-}
-{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE TypeOperators     #-}
 
 {-|
 Module : Web.Mastodon.Auth
@@ -11,7 +10,6 @@ Description : Code having to do with adding authentication using Servant's gener
 module Web.Mastodon.Auth
   ( Auth
   , MastodonAuth
-  , MastodonToken(..)
   , AuthWrapper
   , tokenToAuth
   ) where
@@ -22,13 +20,12 @@ import           Servant.API        hiding (addHeader)
 import           Servant.Client
 import           Servant.Common.Req
 
+import           Web.Mastodon.Types
+
 -- | Dummy data type which is used as a tag to AuthProtect so that we can make the type function
 --   AuthClientData (which takes an AuthProtect _ type) return the correct authentication
 --   method (our MastodonToken).
 data MastodonAuth
-
--- | Newtype for the Mastodon access token
-newtype MastodonToken = MastodonToken { getMastodonToken :: T.Text } deriving (Show, ToHttpApiData)
 
 -- | Adds the necessary @Authorization@ header to the request
 --   The way servant\'s generalized authentication works is that by adding the

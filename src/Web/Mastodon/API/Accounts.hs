@@ -9,17 +9,17 @@ Description : Logic for generating API stuff related to accounts (based on arbit
 module Web.Mastodon.API.Accounts
   ( Accounts
   , accountsApi
-  , getAccountById
+  , getAccountByUid
   , verifyCredentials
-  , getFollowersForId
-  , getFollowingForId
-  , getStatusesForId
-  , followId
-  , unfollowId
-  , blockId
-  , unblockId
-  , muteId
-  , unmuteId
+  , getFollowersForUid
+  , getFollowingForUid
+  , getStatusesForUid
+  , followUid
+  , unfollowUid
+  , blockUid
+  , unblockUid
+  , muteUid
+  , unmuteUid
   , getRelationships
   , searchAccounts
   ) where
@@ -87,38 +87,38 @@ account_
   = client accountsApi
 
 -- | Retrieve an @Account@ from an account id.
-getAccountById :: Uid Account -> Mastodon Account
-getAccountById aid = ReaderT $ \t -> account_ (tokenToAuth t) aid
+getAccountByUid :: Uid Account -> Mastodon Account
+getAccountByUid aid = ReaderT $ \t -> account_ (tokenToAuth t) aid
 
 verifyCredentials :: Mastodon Account
 verifyCredentials = ReaderT $ \t -> verifyCredentials_ $ tokenToAuth t
 
-getFollowersForId :: Uid Account -> Mastodon [Account]
-getFollowersForId aid = ReaderT $ \t -> followers_ (tokenToAuth t) aid
+getFollowersForUid :: Uid Account -> Mastodon [Account]
+getFollowersForUid aid = ReaderT $ \t -> followers_ (tokenToAuth t) aid
 
-getFollowingForId :: Uid Account -> Mastodon [Account]
-getFollowingForId aid = ReaderT $ \t -> following_ (tokenToAuth t) aid
+getFollowingForUid :: Uid Account -> Mastodon [Account]
+getFollowingForUid aid = ReaderT $ \t -> following_ (tokenToAuth t) aid
 
-getStatusesForId :: Uid Account -> Bool -> Bool -> Mastodon [Status]
-getStatusesForId aid onlyMedia noReplies = ReaderT $ \t -> statuses_ (tokenToAuth t) aid onlyMedia noReplies
+getStatusesForUid :: Uid Account -> Bool -> Bool -> Mastodon [Status]
+getStatusesForUid aid onlyMedia noReplies = ReaderT $ \t -> statuses_ (tokenToAuth t) aid onlyMedia noReplies
 
-followId :: Uid Account -> Mastodon Account
-followId tid = ReaderT $ \t -> follow_ (tokenToAuth t) tid
+followUid :: Uid Account -> Mastodon Account
+followUid tid = ReaderT $ \t -> follow_ (tokenToAuth t) tid
 
-unfollowId :: Uid Account -> Mastodon Account
-unfollowId tid = ReaderT $ \t -> unfollow_ (tokenToAuth t) tid
+unfollowUid :: Uid Account -> Mastodon Account
+unfollowUid tid = ReaderT $ \t -> unfollow_ (tokenToAuth t) tid
 
-blockId :: Uid Account -> Mastodon Account
-blockId tid = ReaderT $ \t -> block_ (tokenToAuth t) tid
+blockUid :: Uid Account -> Mastodon Account
+blockUid tid = ReaderT $ \t -> block_ (tokenToAuth t) tid
 
-unblockId :: Uid Account -> Mastodon Account
-unblockId tid = ReaderT $ \t -> unblock_ (tokenToAuth t) tid
+unblockUid :: Uid Account -> Mastodon Account
+unblockUid tid = ReaderT $ \t -> unblock_ (tokenToAuth t) tid
 
-muteId :: Uid Account -> Mastodon Account
-muteId tid = ReaderT $ \t -> mute_ (tokenToAuth t) tid
+muteUid :: Uid Account -> Mastodon Account
+muteUid tid = ReaderT $ \t -> mute_ (tokenToAuth t) tid
 
-unmuteId :: Uid Account -> Mastodon Account
-unmuteId tid = ReaderT $ \t -> unmute_ (tokenToAuth t) tid
+unmuteUid :: Uid Account -> Mastodon Account
+unmuteUid tid = ReaderT $ \t -> unmute_ (tokenToAuth t) tid
 
 getRelationships :: [Uid Account] -> Mastodon [Relationship]
 getRelationships tids = ReaderT $ \t -> relationships_ (tokenToAuth t) tids

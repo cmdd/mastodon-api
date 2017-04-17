@@ -10,7 +10,7 @@ import           Control.Monad.Trans.Reader
 import           Servant.Client             (ClientEnv, ClientM, ServantError,
                                              runClientM)
 
-import           Web.Mastodon.Auth
+import           Web.Mastodon.Types         (MastodonToken(..))
 
 -- | Reader monad representing a Mastodon computation which takes a Mastodon configuration
 type Mastodon = ReaderT MastodonToken ClientM

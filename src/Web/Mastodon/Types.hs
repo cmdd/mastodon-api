@@ -27,7 +27,7 @@ import           Web.HttpApiData     (ToHttpApiData, toQueryParam)
 -- fromURI = maybeParse URI.parseURI
 
 -- | Represents a unique id number for some type.
---   Rather than making a discrete @Id@ type for every data type (@AccId@, @NotifId@, etc.),
+--   Rather than making a discrete @Uid@ type for every data type (@AccUid@, @NotifUid@, etc.),
 --   we make a newtype with a phantom type parameter to distinguish an account id (@Uid Account@)
 --   from a notification id (@Uid Notification@) while making them both Integers under the hood
 --
@@ -82,8 +82,10 @@ instance ToHttpApiData Visibility where
   toQueryParam Private  = toQueryParam ("private"  :: T.Text)
   toQueryParam Direct   = toQueryParam ("direct"   :: T.Text)
 
+-- Datatypes
+
 data Account = Account
-  { _accountId             :: Uid Account
+  { _accountUid            :: Uid Account
   , _accountUsername       :: T.Text
   , _accountAcct           :: T.Text
   , _accountDisplayName    :: T.Text
@@ -125,7 +127,7 @@ instance FromJSON Application where
                 <*> o .: "website"
 
 data Attachment = Attachment
-  { _attachmentId         :: Uid Attachment
+  { _attachmentUid        :: Uid Attachment
   , _attachmentTypeOf     :: AttachmentType
   , _attachmentUrl        :: Url
   , _attachmentRemoteUrl  :: Maybe Url
@@ -167,7 +169,7 @@ instance FromJSON Context where
             <*> o .: "descendants"
 
 data Notification = Notification
-  { _notificationId        :: Uid Notification
+  { _notificationUid       :: Uid Notification
   , _notificationTypeOf    :: NotificationType
   , _notificationCreatedAt :: Time
   , _notificationAccount   :: Account
@@ -182,11 +184,18 @@ instance FromJSON Notification where
                  <*> o .:  "account"
                  <*> o .:? "status"
 
+-- | Newtype for the Mastodon access token
+newtype MastodonToken = MastodonToken { getMastodonToken :: T.Text } deriving (Show, ToHttpApiData)
+
+instance FromJSON MastodonToken where
+  parseJSON = withObject "mastodon token" $ \o ->
+    MastodonToken <$> o .: "access_token"
+
 data Mention = Mention
   { _mentionUrl      :: Url
   , _mentionUsername :: T.Text
   , _mentionAcct     :: T.Text
-  , _mentionId       :: Uid Account
+  , _mentionUid      :: Uid Account
   } deriving (Show)
 
 instance FromJSON Mention where
@@ -195,6 +204,20 @@ instance FromJSON Mention where
             <*> o .: "username"
             <*> o .: "acct"
             <*> o .: "id"
+
+-- | Type representing OAuth info for an app.
+--   The client id field is not uid since this isn't an integer
+data OAuthInfo = OAuthInfo
+  { _oAuthInfoUid          :: Uid Application
+  , _oAuthInfoClientId     :: T.Text
+  , _oAuthInfoClientSecret :: T.Text
+  } deriving (Show)
+
+instance FromJSON OAuthInfo where
+  parseJSON = withObject "oauthinfo" $ \o ->
+    OAuthInfo <$> o .: "id"
+              <*> o .: "client_id"
+              <*> o .: "client_secret"
 
 data Relationship = Relationship
   { _relationshipFollowing  :: Bool
@@ -213,7 +236,7 @@ instance FromJSON Relationship where
                  <*> o .: "requested"
 
 data Report = Report
-  { reportId     :: Uid Report
+  { reportUid    :: Uid Report
   , reportAction :: T.Text
   } deriving (Show)
 
@@ -222,15 +245,6 @@ instance FromJSON Report where
     Report <$> o .: "id"
            <*> o .: "action_taken"
 
-data SearchQuery = SearchQuery
-  { _searchQueryQuery   :: T.Text
-  , _searchQueryResolve :: Bool
-  } deriving (Show)
-
-instance ToForm SearchQuery where
-  toForm (SearchQuery q r) =
-    [ ("q",       toQueryParam q)
-    , ("resolve", toQueryParam r) ]
 
 data SearchResults = SearchResults
   { _searchResultsAccounts :: [Account]
@@ -246,26 +260,26 @@ instance FromJSON SearchResults where
 
 -- TODO: What is type of uri?
 data Status = Status
-  { _statusId                 :: Uid Status
-  , _statusUri                :: T.Text
-  , _statusUrl                :: Url
-  , _statusAccount            :: Account
-  , _statusInReplyToId        :: Maybe (Uid Status)
-  , _statusInReplyToAccountId :: Maybe (Uid Account)
-  , _statusReblog             :: Maybe Status
-  , _statusContent            :: T.Text
-  , _statusCreatedAt          :: Time
-  , _statusReblogsCount       :: Integer
-  , _statusFavoritesCount     :: Integer
-  , _statusReblogged          :: Bool
-  , _statusFavorited          :: Bool
-  , _statusSensitive          :: Bool
-  , _statusSpoilerText        :: T.Text
-  , _statusVisibility         :: Visibility
-  , _statusMediaAttachments   :: [Attachment]
-  , _statusMentions           :: [Mention]
-  , _statusTags               :: [Tag]
-  , _statusApplication        :: Application
+  { _statusUid                 :: Uid Status
+  , _statusUri                 :: T.Text
+  , _statusUrl                 :: Url
+  , _statusAccount             :: Account
+  , _statusInReplyToUid        :: Maybe (Uid Status)
+  , _statusInReplyToAccountUid :: Maybe (Uid Account)
+  , _statusReblog              :: Maybe Status
+  , _statusContent             :: T.Text
+  , _statusCreatedAt           :: Time
+  , _statusReblogsCount        :: Integer
+  , _statusFavoritesCount      :: Integer
+  , _statusReblogged           :: Bool
+  , _statusFavorited           :: Bool
+  , _statusSensitive           :: Bool
+  , _statusSpoilerText         :: T.Text
+  , _statusVisibility          :: Visibility
+  , _statusMediaAttachments    :: [Attachment]
+  , _statusMentions            :: [Mention]
+  , _statusTags                :: [Tag]
+  , _statusApplication         :: Application
   } deriving (Show)
 
 instance FromJSON Status where
@@ -291,27 +305,6 @@ instance FromJSON Status where
            <*> o .:  "tags"
            <*> o .:  "application"
 
-data StatusPayload = StatusPayload
-  { _statusPayloadStatus :: T.Text
-  , _statusPayloadInReplyToId :: Maybe (Uid Status)
-  , _statusPayloadMediaIds :: Maybe [Uid Attachment]
-  , _statusPayloadSensitive :: Maybe Bool
-  , _statusPayloadSpoilerText :: Maybe T.Text
-  , _statusPayloadVisibility :: Maybe Visibility
-  } deriving (Show)
-
-instance ToForm StatusPayload where
-  toForm (StatusPayload status rid mids sens st vis) =
-    [ ("status",         toQueryParam status)
-    , ("in_reply_to_id", toQueryParam rid)
-    , ("sensitive",      toQueryParam sens)
-    , ("spoiler_text",   toQueryParam st)
-    , ("visibility",     toQueryParam vis) ] <> hmap
-    where
-      keys = map (\y -> "media_ids" <> "[" <> y <> "]") (fmap (T.pack . show) [0..])
-      hash = zip keys $ toQueryParam <$> sequenceA mids
-      hmap = Form . fromList . fmap (\(k, v) -> (k, [v])) $ hash
-
 data Tag = Tag
   { _tagName :: T.Text
   , _tagUrl  :: Url
@@ -328,6 +321,75 @@ newtype Time = Time { getTime :: T.Text } deriving (Show)
 instance FromJSON Time where
   parseJSON = withText "time" $ pure . Time
 
+-- TODO: An actual Url type, not just a string
+newtype Url = Url { getUrl :: T.Text } deriving (Show)
+
+instance FromJSON Url where
+  parseJSON = withText "url" $ pure. Url
+
+-- Types for only sending things
+
+-- | Type containing necessary fields to register for an application to get client id and secret
+data ApplicationPayload = ApplicationPayload
+  { _applicationPayloadName         :: T.Text
+  , _applicationPayloadRedirectUris :: T.Text
+  , _applicationPayloadScopes       :: T.Text
+  , _applicationPayloadWebsite      :: Maybe T.Text
+  } deriving (Show)
+
+instance ToForm ApplicationPayload where
+  toForm (ApplicationPayload name uris scopes site) =
+    [ ("client_name",   toQueryParam name)
+    , ("redirect_uris", toQueryParam uris)
+    , ("scopes",        toQueryParam scopes)
+    , ("website",       toQueryParam site) ]
+
+-- | Type for information needed to register with OAuth.
+data OAuthPayload = OAuthPayload
+  { _oAuthPayloadInfo     :: OAuthInfo
+  , _oAuthPayloadEmail    :: T.Text
+  , _oAuthPayloadPassword :: T.Text
+  } deriving (Show)
+
+instance ToForm OAuthPayload where
+  toForm (OAuthPayload (OAuthInfo _ cid cs) e p) =
+    [ ("client_id",     toQueryParam cid)
+    , ("client_secret", toQueryParam cs)
+    , ("grant_type",    toQueryParam ("password" :: T.Text))
+    , ("username",      toQueryParam e)
+    , ("password",      toQueryParam p) ]
+
+data SearchQuery = SearchQuery
+  { _searchQueryQuery   :: T.Text
+  , _searchQueryResolve :: Bool
+  } deriving (Show)
+
+instance ToForm SearchQuery where
+  toForm (SearchQuery q r) =
+    [ ("q",       toQueryParam q)
+    , ("resolve", toQueryParam r) ]
+
+data StatusPayload = StatusPayload
+  { _statusPayloadStatus       :: T.Text
+  , _statusPayloadInReplyToUid :: Maybe (Uid Status)
+  , _statusPayloadMediaUids    :: Maybe [Uid Attachment]
+  , _statusPayloadSensitive    :: Maybe Bool
+  , _statusPayloadSpoilerText  :: Maybe T.Text
+  , _statusPayloadVisibility   :: Maybe Visibility
+  } deriving (Show)
+
+instance ToForm StatusPayload where
+  toForm (StatusPayload status rid mids sens st vis) =
+    [ ("status",         toQueryParam status)
+    , ("in_reply_to_id", toQueryParam rid)
+    , ("sensitive",      toQueryParam sens)
+    , ("spoiler_text",   toQueryParam st)
+    , ("visibility",     toQueryParam vis) ] <> hmap
+    where
+      keys = map (\y -> "media_ids" <> "[" <> y <> "]") (fmap (T.pack . show) [0..])
+      hash = zip keys $ toQueryParam <$> sequenceA mids
+      hmap = Form . fromList . fmap (\(k, v) -> (k, [v])) $ hash
+
 -- | Type which represents a form payload of some Uid.
 --   Essentially, an object with just an id field.
 newtype UidPayload a = UidPayload (Uid a) deriving (Show)
@@ -340,20 +402,17 @@ newtype UriPayload = UriPayload T.Text deriving (Show)
 instance ToForm UriPayload where
   toForm (UriPayload a) = [("uri", toQueryParam a)]
 
--- TODO: An actual Url type, not just a string
-newtype Url = Url { getUrl :: T.Text } deriving (Show)
-
-instance FromJSON Url where
-  parseJSON = withText "url" $ pure. Url
-
 -- Lenses
 makeFields ''Account
 makeFields ''Application
+-- makeFields ''ApplicationPayload
 makeFields ''Attachment
 makeFields ''Card
 makeFields ''Context
 makeFields ''Notification
 makeFields ''Mention
+makeFields ''OAuthInfo
+-- makeFields ''OAuthPayload
 makeFields ''Relationship
 makeFields ''Report
 -- makeFields ''SearchQuery

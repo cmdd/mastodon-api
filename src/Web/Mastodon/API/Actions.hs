@@ -18,7 +18,7 @@ module Web.Mastodon.API.Actions
   , getInstance
   , getMutes
   , getNotifications
-  , getNotificationById
+  , getNotificationByUid
   , clearNotifications
   , getReports
   , search
@@ -109,8 +109,8 @@ getMutes = ReaderT $ \t -> mutes_ (tokenToAuth t)
 getNotifications :: Mastodon [Notification]
 getNotifications = ReaderT $ \t -> notifications_ (tokenToAuth t)
 
-getNotificationById :: Uid Notification -> Mastodon Notification
-getNotificationById nid = ReaderT $ \t -> notificationByid_ (tokenToAuth t) nid
+getNotificationByUid :: Uid Notification -> Mastodon Notification
+getNotificationByUid nid = ReaderT $ \t -> notificationByid_ (tokenToAuth t) nid
 
 clearNotifications :: Mastodon NoContent
 clearNotifications = ReaderT $ \t -> clearNotifications_ (tokenToAuth t)

@@ -25,10 +25,10 @@ library
                      , Web.Mastodon.API.Apps
                      , Web.Mastodon.API.Statuses
                      , Web.Mastodon.API.Timelines
-                     , Web.Mastodon.Auth
-                     , Web.Mastodon.Misc
+                     , Web.Mastodon.Helpers
                      , Web.Mastodon.Monad
                      , Web.Mastodon.Types
+  other-modules:       Web.Mastodon.Auth
   build-depends:       base >= 4.7 && < 5
   default-language:    Haskell2010
   build-depends:       aeson

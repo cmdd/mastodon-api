@@ -65,11 +65,11 @@ runSpec :: MastodonToken -> String -> Spec
 runSpec token base =
   describe "Web.Mastodon.API" $
     it "retrieves an authenticated account" $
-      getId token base `shouldReturn` True
+      getUid token base `shouldReturn` True
 
 -- Copied straight from the README
-getId :: MastodonToken -> String -> IO Bool
-getId token base = do
+getUid :: MastodonToken -> String -> IO Bool
+getUid token base = do
   manager <- newManager tlsManagerSettings
   let clientEnv = ClientEnv manager (BaseUrl Https base 443 "/api/v1")
   res <- runMastodon verifyCredentials token clientEnv
