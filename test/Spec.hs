@@ -17,7 +17,6 @@ import           Test.Hspec
 import qualified Data.Text               as T
 
 import           Web.Mastodon.API        as API
-import           Web.Mastodon.Auth
 import           Web.Mastodon.Monad
 import           Web.Mastodon.Types
 
@@ -65,11 +64,11 @@ runSpec :: MastodonToken -> String -> Spec
 runSpec token base =
   describe "Web.Mastodon.API" $
     it "retrieves an authenticated account" $
-      getUid token base `shouldReturn` True
+      getVerified token base `shouldReturn` True
 
 -- Copied straight from the README
-getUid :: MastodonToken -> String -> IO Bool
-getUid token base = do
+getVerified :: MastodonToken -> String -> IO Bool
+getVerified token base = do
   manager <- newManager tlsManagerSettings
   let clientEnv = ClientEnv manager (BaseUrl Https base 443 "/api/v1")
   res <- runMastodon verifyCredentials token clientEnv
