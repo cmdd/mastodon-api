@@ -38,7 +38,6 @@ library
                      , servant-client
                      , text
                      , transformers
-                     , unordered-containers
 
 test-suite mastodon-api-test
   type:                exitcode-stdio-1.0

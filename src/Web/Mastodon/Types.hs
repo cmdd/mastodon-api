@@ -10,9 +10,9 @@ module Web.Mastodon.Types where
 
 import           Control.Applicative
 import           Data.Aeson
-import           Data.HashMap.Lazy   (fromList)
 import           Data.Monoid         ((<>))
 import qualified Data.Text           as T
+import           GHC.Exts            (fromList)
 import           Lens.Micro.TH
 import           Web.FormUrlEncoded
 import           Web.HttpApiData     (ToHttpApiData, toQueryParam)
