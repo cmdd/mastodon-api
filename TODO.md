@@ -1,13 +1,16 @@
-- [ ] Cover whole API
+- [x] Cover whole API
   - First priority: `Apps.hs` (OAuth stuff and bearer token) - rename?
     - Will include methods for getting the OAuth credentials & bearer token (see [here](https://github.com/tootsuite/mastodon/blob/master/docs/Using-the-API/API.md#apps) and [here](https://github.com/tootsuite/mastodon/blob/master/docs/Using-the-API/Testing-with-cURL.md)).
 - [ ] Documentation for everything
 - [ ] Testing
   - [ ] Once Apps.hs is implemented, no need to pass in a token.
+- [ ] Nix
 - [ ] Update cabal file completely and correctly
-  - [ ] Version bound dependencies
-  - [ ] `other-modules`?
-- [ ] Correct JSON deserialization (parse urls and times!)
+  - [ ] Metadata
+  - [x] Version bound dependencies _**No need*_
+  - [x] `other-modules`?
+- [ ] `Types.hs` - duplicate record fields (and maybe no underscores) to clean up field names?
+- [x] Correct JSON deserialization (parse urls and times!)
 - [x] Add methods which use Mastodon monad
 - [x] Should `AuthClientData (AuthProtect MastodonAuth) = MastodonConfig`? _Answer: **No, for now**_
   - This would mean that we put in the token from the config in mastodonAuth

@@ -37,6 +37,7 @@ library
                      , servant
                      , servant-client
                      , text
+                     , time
                      , transformers
 
 test-suite mastodon-api-test

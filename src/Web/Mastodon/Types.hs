@@ -12,6 +12,7 @@ import           Control.Applicative
 import           Data.Aeson
 import           Data.Monoid         ((<>))
 import qualified Data.Text           as T
+import           Data.Time           (UTCTime(..))
 import           GHC.Exts            (fromList)
 import           Lens.Micro.TH
 import           Web.FormUrlEncoded
@@ -94,7 +95,7 @@ data Account = Account
   , _accountAvatar         :: Url
   , _accountHeader         :: Url
   , _accountLocked         :: Bool
-  , _accountCreatedAt      :: T.Text
+  , _accountCreatedAt      :: UTCTime
   , _accountFollowersCount :: Integer
   , _accountFollowingCount :: Integer
   , _accountStatusesCount  :: Integer
@@ -171,7 +172,7 @@ instance FromJSON Context where
 data Notification = Notification
   { _notificationUid       :: Uid Notification
   , _notificationTypeOf    :: NotificationType
-  , _notificationCreatedAt :: Time
+  , _notificationCreatedAt :: UTCTime
   , _notificationAccount   :: Account
   , _notificationStatus    :: Maybe Status
   } deriving (Show)
@@ -268,7 +269,7 @@ data Status = Status
   , _statusInReplyToAccountUid :: Maybe (Uid Account)
   , _statusReblog              :: Maybe Status
   , _statusContent             :: T.Text
-  , _statusCreatedAt           :: Time
+  , _statusCreatedAt           :: UTCTime
   , _statusReblogsCount        :: Integer
   , _statusFavoritesCount      :: Integer
   , _statusReblogged           :: Bool
@@ -315,17 +316,10 @@ instance FromJSON Tag where
     Tag <$> o .: "name"
         <*> o .: "url"
 
--- TODO: An actual Time type, not just a string
-newtype Time = Time { getTime :: T.Text } deriving (Show)
-
-instance FromJSON Time where
-  parseJSON = withText "time" $ pure . Time
-
--- TODO: An actual Url type, not just a string
 newtype Url = Url { getUrl :: T.Text } deriving (Show)
 
 instance FromJSON Url where
-  parseJSON = withText "url" $ pure. Url
+  parseJSON = withText "url" $ pure . Url
 
 -- Types for only sending things
 
